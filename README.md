@@ -1,6 +1,6 @@
 This is a colorful, text-based calendar widget for Android.
 
-The color coding is inteded to be especially useful for people who must
+The color coding is intended to be especially useful for people who must
 coordinate multiple calendars.
 
 It is relatively simple, at least by Android project standards, and attempts
