@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">PolyCal</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="calendar_permission_title">Calendar Permission</string>
+    <string name="calendar_permission_summary">Tap to request. Without calendar permission, only Screenshot Mode can be used.</string>
+
+    <string name="screenshot_mode_title">Screenshot Mode</string>
+    <string name="screenshot_mode_summary">This mode populates the widget with fake entries.</string>
+
+    <string name="cal_select_title">Select Calendars</string>
+    <string name="cal_select_summary">Only entries from selected calendars will be displayed.</string>
+</resources>

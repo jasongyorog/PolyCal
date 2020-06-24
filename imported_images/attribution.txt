@@ -1,0 +1,25 @@
+The preview image was created using the Widget Preview app on an emulated Nexus 5 running API 24.
+
+
+
+
+I made the PolyCal icon in GIMP, using two images (attribution below) as source material. I
+noticed that the "Asset Studio" application built-in to Android Studio creates icon sizes at
+108, 162, 216, 324, and 432. To accommodate all these sizes, I worked at 1296x1296, which
+is the least common multiple of that list of numbers.
+
+
+
+https://www.flaticon.com/free-icon/june-16-daily-calendar-page_42328
+Icon made by Freepik from www.flaticon.com
+- This SVG was edited in a text editor, to remove the numerals, then imported into GIMP.
+
+
+
+"Polyamory Pride Flag" 
+https://commons.wikimedia.org/wiki/File:Polyamory_Pride_Flag.svg
+
+
+
+
+
