@@ -11,4 +11,13 @@
 
     <string name="cal_select_title">Select Calendars</string>
     <string name="cal_select_summary">Only entries from selected calendars will be displayed.</string>
+
+    <string name="date_format_title">Date/Time Format</string>
+    <string name="date_format_summary">Select a date and time format for events with a starting time.</string>
+
+    <string name="date_format_allday_title">Date Format</string>
+    <string name="date_format_allday_summary">Select a date format for "all day" events.</string>
+
+    <string name="how_to_add_widget">This app is a home screen widget. For this version of Android, you must add widgets to your home screen by first navigating to the screen where you want the widget. Then, long-press on the screeen where you want the widget.</string>
+    <string name="choose_widget">Multiple widget instances found. Please choose one to configure:</string>
 </resources>

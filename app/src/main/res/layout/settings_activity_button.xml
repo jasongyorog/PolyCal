@@ -3,10 +3,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="top"
     >
-
-    <FrameLayout
+<!--
+    <ListView
         android:id="@+id/settings"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        />
+       -->
+    <fragment android:id="@+id/fragment_settings"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:name="com.gyorog.polycal.SettingsActivity$SettingsFragment"
+        />
+    <Button
+        android:id="@+id/accept_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        />
+
 </LinearLayout>

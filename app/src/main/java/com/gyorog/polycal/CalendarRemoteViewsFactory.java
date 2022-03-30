@@ -1,5 +1,6 @@
 package com.gyorog.polycal;
 
+import android.appwidget.AppWidgetManager;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -8,14 +9,13 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-
-import androidx.preference.PreferenceManager;
 
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -27,24 +27,47 @@ import java.util.Set;
 import java.util.TimeZone;
 
 public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
+    public static final String EVENT_ID = "com.gyorog.polycal.EVENT_ID";
+    public static final String EVENT_BEGIN = "com.gyorog.polycal.EVENT_BEGIN";
     private static final String TAG = "CalendarRemoteViewsFactory";
     private Context mContext;
     private Cursor mCursor;
+    private int widget_id;
+    private String date_format;
+    private String date_format_allday;
 
     public CalendarRemoteViewsFactory(Context applicationContext, Intent intent) {
         mContext = applicationContext;
+        //widget_id = Integer.parseInt(intent.getData().getSchemeSpecificPart());
+        widget_id = intent.getExtras().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+        Log.d(TAG, "wID " + widget_id + " created.");
     }
 
     @Override
-    public void onCreate() {}
+    public void onCreate() { }
 
     @Override
     public void onDataSetChanged() {
         final long identityToken = Binder.clearCallingIdentity();
+        Log.d(TAG, "wID " + widget_id + " got identityToken " + identityToken);
 
-        GetCalendarEvents();
+        // SharedPreferences SharePref = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String pref_file_name = String.format("com.gyorog.PolyCal.prefs_for_widget_%d", widget_id);
+        SharedPreferences SharePref = mContext.getSharedPreferences(pref_file_name , 0);
+
+        date_format = SharePref.getString("date_format", (String) PolyCalDateFormats.getFormatsParseable()[0]);
+        date_format_allday = SharePref.getString("date_format_allday", (String) PolyCalDateFormats.getFormatsParseableAllday()[0]);
+        Log.d(TAG, "wID " + widget_id + " got date_format='" + date_format + "' and date_format_allday='" + date_format_allday + "'");
+
+        Set<String> EnabledCalendarIDs = SharePref.getStringSet("calendar_selection", new HashSet<String>() );
+        Log.d(TAG, "wID " + widget_id + " got calendar_selection='" + EnabledCalendarIDs.toString() + "'" );
+
+        GetCalendarEvents(EnabledCalendarIDs);
+        Log.d(TAG, "wID " + widget_id + " found " + getCount() + " calendar events.");
+
         Binder.restoreCallingIdentity(identityToken);
     }
+
 
     @Override
     public void onDestroy() {
@@ -60,15 +83,16 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
 
     @Override
     public RemoteViews getViewAt(int position) {
+        Log.d(TAG, "RemoteViews getViewAt(" + position + ")");
         if (position == AdapterView.INVALID_POSITION || mCursor == null || !mCursor.moveToPosition(position)) {
             return null;
         }
 
         SimpleDateFormat formatter;
         if ( 1 == mCursor.getInt(EVENT_INDEX_ALLDAY) ) {
-            formatter = new SimpleDateFormat(" MMM d ", Locale.US);
+            formatter = new SimpleDateFormat(date_format_allday, Locale.US);
         } else {
-            formatter = new SimpleDateFormat(" MMM d | h:mm a ", Locale.US);
+            formatter = new SimpleDateFormat(date_format, Locale.US);
         }
         DateFormatSymbols symbols = new DateFormatSymbols(Locale.getDefault());
         symbols.setAmPmStrings(new String[] { "am", "pm" });
@@ -77,6 +101,14 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
         formatter.setTimeZone(TimeZone.getTimeZone( mCursor.getString(EVENT_INDEX_EVENT_TIMEZONE) ));
 
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.appwidget_item);
+
+        Bundle extras = new Bundle();
+        //extras.putLong(EVENT_ID, mCursor.getLong(EVENT_INDEX_EVENTID));
+        extras.putLong(EVENT_BEGIN, mCursor.getLong(EVENT_INDEX_BEGIN));
+        Intent fillInIntent = new Intent();
+        fillInIntent.putExtras(extras);
+        rv.setOnClickFillInIntent(R.id.item_layout, fillInIntent);
+
         int other_color = Color.LTGRAY;
 
         rv.setTextViewText(R.id.event_time, formatter.format(StartDate) );
@@ -119,7 +151,8 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
             CalendarContract.Events.EVENT_TIMEZONE,
             CalendarContract.Events.DISPLAY_COLOR,
             CalendarContract.Events.TITLE,
-            CalendarContract.Events.EVENT_LOCATION
+            CalendarContract.Events.EVENT_LOCATION,
+            CalendarContract.Instances.END
     };
     private static final int EVENT_INDEX_EVENTID = 0;
     private static final int EVENT_INDEX_BEGIN = 1;
@@ -128,11 +161,9 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
     private static final int EVENT_INDEX_DISPLAY_COLOR = 4;
     private static final int EVENT_INDEX_TITLE = 5;
     private static final int EVENT_INDEX_LOCATION = 6;
+    private static final int EVENT_INDEX_END = 7;
 
-    private void GetCalendarEvents() {
-        SharedPreferences SharePref = PreferenceManager.getDefaultSharedPreferences(mContext);
-        Set<String> EnabledCalendarIDs = SharePref.getStringSet("calendar_select", new HashSet<String>() );
-
+    private void GetCalendarEvents(Set<String> EnabledCalendarIDs) {
         long now_ms = System.currentTimeMillis();
 
         Calendar cal_end = Calendar.getInstance();
@@ -146,8 +177,11 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
 
         String[] selectionArgs = new String[0];
         String selectionString = "";
-        if( ! EnabledCalendarIDs.isEmpty() ) {
-            selectionArgs = EnabledCalendarIDs.toArray(new String[EnabledCalendarIDs.size()]);
+        if( EnabledCalendarIDs.isEmpty() ) {
+            selectionString = "( " + CalendarContract.Instances.CALENDAR_ID + " != " + CalendarContract.Instances.CALENDAR_ID + " )";
+        } else {
+            // selectionArgs = EnabledCalendarIDs.toArray(new String[EnabledCalendarIDs.size()]);
+            selectionArgs = EnabledCalendarIDs.toArray(new String[0]);
 
             String[] query_list = new String[selectionArgs.length];
             for(int i=0; i<selectionArgs.length; ++i){
@@ -156,8 +190,8 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
             selectionString = TextUtils.join(" OR ", query_list);
         }
 
-        // Log.e(TAG, "Query: " + selectionString);
-        // Log.e(TAG, "Args: " + TextUtils.join(",", selectionArgs));
+        // Log.d(TAG, "Query: " + selectionString);
+        // Log.d(TAG, "Args: " + TextUtils.join(",", selectionArgs));
         mCursor = mContext.getContentResolver().query(instancesUri, EVENT_COLUMN_LIST, selectionString,selectionArgs, CalendarContract.Instances.BEGIN + " ASC");
     }
 }

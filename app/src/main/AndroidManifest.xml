@@ -5,41 +5,57 @@
     <uses-permission android:name="android.permission.READ_CALENDAR" />
 
     <application
-        android:allowBackup="true"
-        android:icon="@mipmap/polycal_icon"
         android:label="@string/app_name"
+        android:theme="@style/PolyCalTheme"
+        android:icon="@mipmap/polycal_icon"
+        android:allowBackup="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        >
 
         <activity
-            android:name=".SettingsActivity"
-            android:label="@string/app_name">
+            android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
+
         <receiver
-            android:name=".CalendarWidgetProvider">
+            android:name=".PolyCalWidgetProvider"
+            android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE_OPTIONS"/>
-                <action android:name="com.gyorog.polycal.RELOAD_EVENTS"/>
-                <action android:name="com.gyorog.polycal.CHANGE_SOURCE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE_OPTIONS" />
+                <action android:name="com.gyorog.polycal.RELOAD_EVENTS" />
+                <action android:name="com.gyorog.polycal.CHANGE_SOURCE" />
+                <action android:name="com.gyorog.polycal.LAUNCH_CALENDAR" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider"
+
+            <meta-data
+                android:name="android.appwidget.provider"
                 android:resource="@xml/appwidget_provider" />
         </receiver>
 
-        <service android:name=".CalendarRemoteViewsService"
-            android:permission="android.permission.BIND_REMOTEVIEWS">
-        </service>
-        <service android:name=".ScreenshotRemoteViewsService"
-            android:permission="android.permission.BIND_REMOTEVIEWS">
-        </service>
+        <service
+            android:name=".CalendarRemoteViewsService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+        <service
+            android:name=".ScreenshotRemoteViewsService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

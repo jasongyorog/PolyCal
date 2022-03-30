@@ -16,5 +16,15 @@
             android:summary="@string/cal_select_summary"
             android:key="calendar_select" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="Appearance">
+        <ListPreference
+            android:title="@string/date_format_title"
+            android:summary="@string/date_format_summary"
+            android:key="date_format" />
+        <ListPreference
+            android:title="@string/date_format_allday_title"
+            android:summary="@string/date_format_allday_summary"
+            android:key="date_format_allday" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

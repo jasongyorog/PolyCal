@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:configure="com.gyorog.polycal.SettingsActivity"
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/appwidget"
     android:previewImage="@drawable/widget_preview"
