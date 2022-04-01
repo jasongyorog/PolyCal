@@ -113,12 +113,12 @@ public class ScreenshotRemoteViewsFactory implements RemoteViewsService.RemoteVi
         formatter.setDateFormatSymbols(symbols);
         
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.appwidget_item);
-/*
+
         Intent settings_intent = new Intent(mContext, SettingsActivity.class);
         settings_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widget_id);
         settings_intent.putExtra("from", "Screenshot.UserClick");
         rv.setOnClickFillInIntent(R.id.item_layout, settings_intent);
-*/
+
         rv.setTextViewText(R.id.event_time, formatter.format(my_entry.begin));
         rv.setTextColor(R.id.event_time, other_color);
 

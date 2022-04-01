@@ -41,42 +41,44 @@ public class PolyCalWidgetProvider extends AppWidgetProvider {
             if (calendar_permissions && ! CheckScreenshotMode(context, widgetId)) {
                 Log.d(TAG, "wID " + widgetId + " is in Calendar mode");
                 view_intent = new Intent(context, CalendarRemoteViewsService.class);
+                view_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+                view_intent.setData(Uri.parse(view_intent.toUri(Intent.URI_INTENT_SCHEME)));
+                LogIntent("onUpdate(calendar) view_intent", view_intent);
+
+                // Launch Calendar when clicked
+                Intent launch_calendar_intent = new Intent(context, PolyCalWidgetProvider.class);
+                launch_calendar_intent.setAction(PolyCalWidgetProvider.LAUNCH_CALENDAR);
+                launch_calendar_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
+                LogIntent("onUpdate(calendar) launch_calendar_intent", launch_calendar_intent);
+
+                PendingIntent launchCalPendingIntent = PendingIntent.getBroadcast(context, 0, launch_calendar_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                remoteViews.setPendingIntentTemplate(R.id.listview, launchCalPendingIntent);
+
             } else {
                 Log.d(TAG, "wID " + widgetId + " is in Screenshot mode");
                 view_intent = new Intent(context, ScreenshotRemoteViewsService.class);
-            }
-            view_intent.setData(Uri.parse(view_intent.toUri(Intent.URI_INTENT_SCHEME)));
-            view_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+                view_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+                LogIntent("onUpdate(screenshot) view_intent", view_intent);
 
-            //LogIntent("onUpdate()", view_intent);
+                //  Launch Setting when clicked
+                Intent settings_intent = new Intent(context, SettingsActivity.class);
+                settings_intent.setData(Uri.parse("wid://" + widgetId)); // Ensures uniqueness when creating PendingIntent
+                settings_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+                settings_intent.putExtra("from", "Layout.UserClick");
+                LogIntent("onUpdate(screenshot) settings_intent", settings_intent);
+                Log.d(TAG, "created settings_intent for wID=" + widgetId);
+
+                PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, settings_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                remoteViews.setOnClickPendingIntent(R.id.layout, pendingIntent);
+                remoteViews.setPendingIntentTemplate(R.id.listview, pendingIntent);
+            }
 
             remoteViews.setRemoteAdapter(R.id.listview, view_intent);
             remoteViews.setEmptyView(R.id.listview, R.id.empty_view);
 
-            // Launch Calendar when clicked
-            Intent launch_calendar_intent = new Intent(context, PolyCalWidgetProvider.class);
-            launch_calendar_intent.setAction(PolyCalWidgetProvider.LAUNCH_CALENDAR);
-            launch_calendar_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
-
-            view_intent.setData(Uri.parse(view_intent.toUri(Intent.URI_INTENT_SCHEME)));
-            PendingIntent launchCalPendingIntent = PendingIntent.getBroadcast(context, 0, launch_calendar_intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setPendingIntentTemplate(R.id.listview, launchCalPendingIntent);
-
-/*
-            //  Launch Setting when clicked
-            Intent settings_intent = new Intent(context, SettingsActivity.class);
-            settings_intent.setData(Uri.parse("wid://" + widgetId)); // Ensures uniqueness when creating PendingIntent
-            settings_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
-            settings_intent.putExtra("from", "Layout.UserClick");
-            Log.d(TAG, "created settings_intent for wID=" + widgetId);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, settings_intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-            remoteViews.setOnClickPendingIntent(R.id.layout, pendingIntent);
-            remoteViews.setPendingIntentTemplate(R.id.listview, pendingIntent);
-*/
             appWidgetManager.updateAppWidget(widgetId, remoteViews);
         }
-        //Log.d(TAG, "End of OnUpdate()");
+        Log.d(TAG, "End of OnUpdate()");
     }
 
     private boolean CheckScreenshotMode(Context context, int widget_id) {
@@ -135,11 +137,11 @@ public class PolyCalWidgetProvider extends AppWidgetProvider {
         super.onDisabled(context);
     }
 
-/*
+
     public void LogIntent(String extra_tag, Intent intent){
         Log.d(TAG, extra_tag + " -> " + intent.toString() );
         for (String key : intent.getExtras().keySet())
             Log.d(TAG, "(extra) " + key + " = " + intent.getExtras().get(key));
     }
-*/
+
 }
