@@ -1,0 +1,1 @@
+Clicking an event now launches the calendar to that date.
