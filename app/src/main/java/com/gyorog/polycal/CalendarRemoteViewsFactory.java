@@ -114,10 +114,20 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
         rv.setTextViewText(R.id.event_time, formatter.format(StartDate) );
         rv.setTextColor(R.id.event_time, other_color);
 
-        rv.setTextViewText(R.id.event_title, mCursor.getString(EVENT_INDEX_TITLE).replaceAll("[\\t\\n\\r]+"," ") );
+        String title_raw = mCursor.getString(EVENT_INDEX_TITLE);
+        if (title_raw != null) {
+            rv.setTextViewText(R.id.event_title, title_raw.replaceAll("[\\t\\n\\r]+", " "));
+        } else {
+            rv.setTextViewText(R.id.event_title, "");
+        }
         rv.setTextColor(R.id.event_title, mCursor.getInt(EVENT_INDEX_DISPLAY_COLOR));
 
-        rv.setTextViewText(R.id.event_location, mCursor.getString(EVENT_INDEX_LOCATION).replaceAll("[\\t\\n\\r]+"," ") );
+        String location_raw = mCursor.getString(EVENT_INDEX_LOCATION);
+        if (location_raw != null) {
+            rv.setTextViewText(R.id.event_location, location_raw.replaceAll("[\\t\\n\\r]+", " "));
+        } else {
+            rv.setTextViewText(R.id.event_location, "" );
+        }
         rv.setTextColor(R.id.event_location, other_color);
 
         return rv;
