@@ -51,7 +51,7 @@ public class PolyCalWidgetProvider extends AppWidgetProvider {
                 launch_calendar_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
                 LogIntent("onUpdate(calendar) launch_calendar_intent", launch_calendar_intent);
 
-                PendingIntent launchCalPendingIntent = PendingIntent.getBroadcast(context, 0, launch_calendar_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent launchCalPendingIntent = PendingIntent.getBroadcast(context, 0, launch_calendar_intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                 remoteViews.setPendingIntentTemplate(R.id.listview, launchCalPendingIntent);
 
             } else {
@@ -68,7 +68,7 @@ public class PolyCalWidgetProvider extends AppWidgetProvider {
                 LogIntent("onUpdate(screenshot) settings_intent", settings_intent);
                 Log.d(TAG, "created settings_intent for wID=" + widgetId);
 
-                PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, settings_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, settings_intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                 remoteViews.setOnClickPendingIntent(R.id.layout, pendingIntent);
                 remoteViews.setPendingIntentTemplate(R.id.listview, pendingIntent);
             }
