@@ -17,6 +17,12 @@
             android:key="calendar_select" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Appearance">
+        <SeekBarPreference
+            android:title="Text size (SP)"
+            android:summary="Choose a font size using the Android 'Scaled Pixel' units."
+            android:defaultValue="14"
+            android:max="40"
+            android:key="text_size" />
         <ListPreference
             android:title="@string/date_format_title"
             android:summary="@string/date_format_summary"

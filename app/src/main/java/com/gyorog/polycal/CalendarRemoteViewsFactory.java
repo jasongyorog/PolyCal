@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -33,6 +34,7 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
     private Context mContext;
     private Cursor mCursor;
     private int widget_id;
+    private int text_size;
     private String date_format;
     private String date_format_allday;
 
@@ -55,6 +57,7 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
         String pref_file_name = String.format("com.gyorog.PolyCal.prefs_for_widget_%d", widget_id);
         SharedPreferences SharePref = mContext.getSharedPreferences(pref_file_name , 0);
 
+        text_size = SharePref.getInt("text_size", 12);
         date_format = SharePref.getString("date_format", (String) PolyCalDateFormats.getFormatsParseable()[0]);
         date_format_allday = SharePref.getString("date_format_allday", (String) PolyCalDateFormats.getFormatsParseableAllday()[0]);
         Log.d(TAG, "wID " + widget_id + " got date_format='" + date_format + "' and date_format_allday='" + date_format_allday + "'");
@@ -113,6 +116,7 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
 
         rv.setTextViewText(R.id.event_time, formatter.format(StartDate) );
         rv.setTextColor(R.id.event_time, other_color);
+        rv.setTextViewTextSize(R.id.event_time, TypedValue.COMPLEX_UNIT_SP, text_size);
 
         String title_raw = mCursor.getString(EVENT_INDEX_TITLE);
         if (title_raw != null) {
@@ -121,6 +125,7 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
             rv.setTextViewText(R.id.event_title, "");
         }
         rv.setTextColor(R.id.event_title, mCursor.getInt(EVENT_INDEX_DISPLAY_COLOR));
+        rv.setTextViewTextSize(R.id.event_title, TypedValue.COMPLEX_UNIT_SP, text_size);
 
         String location_raw = mCursor.getString(EVENT_INDEX_LOCATION);
         if (location_raw != null) {
@@ -129,6 +134,7 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
             rv.setTextViewText(R.id.event_location, "" );
         }
         rv.setTextColor(R.id.event_location, other_color);
+        rv.setTextViewTextSize(R.id.event_location, TypedValue.COMPLEX_UNIT_SP, text_size);
 
         return rv;
     }

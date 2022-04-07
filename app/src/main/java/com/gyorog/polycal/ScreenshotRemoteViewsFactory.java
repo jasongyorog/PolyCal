@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Binder;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -21,6 +22,7 @@ public class ScreenshotRemoteViewsFactory implements RemoteViewsService.RemoteVi
     private static final String TAG = "ScreenshotRemoteViewsFactory";
     private Context mContext;
     private int widget_id;
+    private int text_size;
     private String date_format;
     private String date_format_allday;
 
@@ -78,6 +80,7 @@ public class ScreenshotRemoteViewsFactory implements RemoteViewsService.RemoteVi
         String pref_file_name = String.format("com.gyorog.PolyCal.prefs_for_widget_%d", widget_id);
         SharedPreferences SharePref = mContext.getSharedPreferences(pref_file_name , 0);
 
+        text_size = SharePref.getInt("text_size", 12);
         date_format = SharePref.getString("date_format", (String) PolyCalDateFormats.getFormatsParseable()[0]);
         date_format_allday = SharePref.getString("date_format_allday", (String) PolyCalDateFormats.getFormatsParseableAllday()[0]);
         Log.d(TAG, "wID " + widget_id + " got date_format='" + date_format + "' and date_format_allday='" + date_format_allday + "'");
@@ -121,12 +124,15 @@ public class ScreenshotRemoteViewsFactory implements RemoteViewsService.RemoteVi
 
         rv.setTextViewText(R.id.event_time, formatter.format(my_entry.begin));
         rv.setTextColor(R.id.event_time, other_color);
+        rv.setTextViewTextSize(R.id.event_time, TypedValue.COMPLEX_UNIT_SP, text_size);
 
         rv.setTextViewText(R.id.event_title, my_entry.title);
         rv.setTextColor(R.id.event_title, Color.parseColor(my_entry.color) );
+        rv.setTextViewTextSize(R.id.event_title, TypedValue.COMPLEX_UNIT_SP, text_size);
 
         rv.setTextViewText(R.id.event_location, my_entry.location);
         rv.setTextColor(R.id.event_location, other_color);
+        rv.setTextViewTextSize(R.id.event_location, TypedValue.COMPLEX_UNIT_SP, text_size);
 
         return rv;
     }

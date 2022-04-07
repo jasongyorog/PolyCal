@@ -21,6 +21,7 @@ import androidx.preference.ListPreference;
 import androidx.preference.MultiSelectListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SeekBarPreference;
 import androidx.preference.SwitchPreference;
 
 import java.util.Arrays;
@@ -144,6 +145,29 @@ public class SettingsActivity extends AppCompatActivity {
                     return true;
                 }
             });
+
+            SeekBarPreference seek_bar = findPreference("text_size");
+            if (seek_bar != null) {
+                seek_bar.setShowSeekBarValue(true);
+                seek_bar.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newVal) {
+                        Log.d(TAG, "wID " + widget_id + " onPreferenceChange(text_size=" + newVal.toString() + ")");
+
+                        String pref_file_name = String.format("com.gyorog.PolyCal.prefs_for_widget_%d", widget_id);
+                        SharedPreferences SharePref = preference.getContext().getSharedPreferences(pref_file_name, 0);
+                        SharedPreferences.Editor editor = SharePref.edit();
+                        editor.putInt("text_size", (int) newVal);
+                        editor.apply();
+
+                        Intent redraw = new Intent("com.gyorog.polycal.RELOAD_EVENTS");
+                        redraw.setPackage(getContext().getPackageName());
+                        getContext().sendBroadcast(redraw);
+
+                        return true;
+                    }
+                });
+            }
 
             findPreference("date_format").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override

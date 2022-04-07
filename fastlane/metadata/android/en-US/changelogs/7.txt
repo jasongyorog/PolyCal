@@ -1,1 +1,2 @@
+Added text size slider.
 Added FLAG_IMMUTABLE to prevent a crash on Android 12.
