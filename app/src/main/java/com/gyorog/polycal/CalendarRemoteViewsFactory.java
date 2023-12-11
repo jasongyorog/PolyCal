@@ -94,6 +94,7 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
         SimpleDateFormat formatter;
         if ( 1 == mCursor.getInt(EVENT_INDEX_ALLDAY) ) {
             formatter = new SimpleDateFormat(date_format_allday, Locale.US);
+            formatter.setTimeZone(TimeZone.getTimeZone( mCursor.getString(EVENT_INDEX_EVENT_TIMEZONE) ));
         } else {
             formatter = new SimpleDateFormat(date_format, Locale.US);
         }
@@ -101,7 +102,6 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
         symbols.setAmPmStrings(new String[] { "am", "pm" });
         formatter.setDateFormatSymbols(symbols);
         Date StartDate = new Date( mCursor.getLong(EVENT_INDEX_BEGIN) );
-        formatter.setTimeZone(TimeZone.getTimeZone( mCursor.getString(EVENT_INDEX_EVENT_TIMEZONE) ));
 
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.appwidget_item);
 
@@ -208,6 +208,6 @@ public class CalendarRemoteViewsFactory implements RemoteViewsService.RemoteView
 
         // Log.d(TAG, "Query: " + selectionString);
         // Log.d(TAG, "Args: " + TextUtils.join(",", selectionArgs));
-        mCursor = mContext.getContentResolver().query(instancesUri, EVENT_COLUMN_LIST, selectionString,selectionArgs, CalendarContract.Instances.BEGIN + " ASC");
+        mCursor = mContext.getContentResolver().query(instancesUri, EVENT_COLUMN_LIST, selectionString,selectionArgs, String.format("%s ASC, %s ASC", CalendarContract.Instances.START_DAY, CalendarContract.Instances.START_MINUTE));
     }
 }
