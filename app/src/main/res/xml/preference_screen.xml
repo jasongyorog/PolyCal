@@ -1,11 +1,13 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory android:title="Calendars">
         <Preference
             android:title="@string/calendar_permission_title"
             android:summary="@string/calendar_permission_summary"
             android:key="calendar_permission" />
-        <SwitchPreference
+        <SwitchPreferenceCompat
+            app:widgetLayout="@layout/preference_material_switch"
             android:enabled="false"
             android:title="@string/screenshot_mode_title"
             android:summary="@string/screenshot_mode_summary"
@@ -31,6 +33,21 @@
             android:title="@string/date_format_allday_title"
             android:summary="@string/date_format_allday_summary"
             android:key="date_format_allday" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="App">
+        <ListPreference
+            android:title="@string/refresh_interval_title"
+            android:summary="%s"
+            android:entries="@array/refresh_interval_entries"
+            android:entryValues="@array/refresh_interval_values"
+            android:defaultValue="30"
+            android:key="refresh_interval" />
+        <SwitchPreferenceCompat
+            app:widgetLayout="@layout/preference_material_switch"
+            android:title="@string/hide_launcher_icon_title"
+            android:summary="@string/hide_launcher_icon_summary"
+            android:defaultValue="false"
+            android:key="hide_launcher_icon" />
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -3,6 +3,7 @@ package com.gyorog.polycal;
 import android.Manifest;
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,12 +18,14 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+
+import com.google.android.material.color.DynamicColors;
 import androidx.preference.ListPreference;
 import androidx.preference.MultiSelectListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SeekBarPreference;
-import androidx.preference.SwitchPreference;
+import androidx.preference.SwitchPreferenceCompat;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -39,6 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        DynamicColors.applyToActivityIfAvailable(this);
         super.onCreate(savedInstanceState);
 
         Bundle extras = getIntent().getExtras();
@@ -74,7 +78,7 @@ public class SettingsActivity extends AppCompatActivity {
             accept_button.setText("Add Widget to Home Screen");
             accept_button.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    setResult(Activity.RESULT_OK);
+                    setResult(Activity.RESULT_OK, new Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widget_id));
                     finish();
                 }
             });
@@ -207,6 +211,26 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             });
 
+            findPreference("refresh_interval").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newVal) {
+                    // Saved to default prefs before scheduling, since scheduleRefresh() reads it from there.
+                    ((ListPreference) preference).setValue((String) newVal);
+                    PolyCalWidgetProvider.scheduleRefresh(getContext());
+                    return false;
+                }
+            });
+
+            findPreference("hide_launcher_icon").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newVal) {
+                    int state = (boolean) newVal ? PackageManager.COMPONENT_ENABLED_STATE_DISABLED : PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+                    getContext().getPackageManager().setComponentEnabledSetting(
+                            new ComponentName(getContext(), MainActivity.class), state, PackageManager.DONT_KILL_APP);
+                    return true;
+                }
+            });
+
             UpdatePreferences();
         }
 
@@ -227,7 +251,7 @@ public class SettingsActivity extends AppCompatActivity {
                 CharSequence[] values_array = ((SettingsActivity) getActivity()).CalendarIDs.toArray(new CharSequence[CalendarCount]);
 
                 Boolean screenshot_mode = SharePref.getBoolean("screenshot_mode", true);
-                SwitchPreference ScreenshotModePref = findPreference("screenshot_mode");
+                SwitchPreferenceCompat ScreenshotModePref = findPreference("screenshot_mode");
                 ScreenshotModePref.setEnabled(true);
                 ScreenshotModePref.setChecked(screenshot_mode);
 

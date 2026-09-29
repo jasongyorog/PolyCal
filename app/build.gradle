@@ -1,14 +1,17 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
 
 android {
-    compileSdkVersion 31
+    namespace 'com.gyorog.polycal'
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.gyorog.polycal"
-        minSdkVersion 24
-        targetSdkVersion 31
-        versionCode 7
-        versionName "1.7"
+        minSdk 24
+        targetSdk 36
+        versionCode 8
+        versionName "1.8"
     }
 
     buildTypes {
@@ -17,11 +20,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'androidx.preference:preference:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    // Aligns kotlin-stdlib-jdk7/jdk8 (pulled by preference) with kotlin-stdlib (pulled by appcompat)
+    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.22')
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'com.google.android.material:material:1.14.0'
+    implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
 }

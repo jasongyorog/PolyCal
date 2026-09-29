@@ -18,6 +18,11 @@
     <string name="date_format_allday_title">Date Format</string>
     <string name="date_format_allday_summary">Select a date format for "all day" events.</string>
 
+    <string name="refresh_interval_title">Auto Refresh (all widgets)</string>
+
+    <string name="hide_launcher_icon_title">Hide Launcher Icon</string>
+    <string name="hide_launcher_icon_summary">Settings stay reachable by long-pressing the widget and choosing reconfigure. Some launchers still show an App Info shortcut.</string>
+
     <string name="how_to_add_widget">This app is a home screen widget. For this version of Android, you must add widgets to your home screen by first navigating to the screen where you want the widget. Then, long-press on the screeen where you want the widget.</string>
     <string name="choose_widget">Multiple widget instances found. Please choose one to configure:</string>
 </resources>

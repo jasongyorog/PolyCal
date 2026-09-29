@@ -1,6 +1,7 @@
 package com.gyorog.polycal;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -10,12 +11,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.CalendarContract;
 import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 public class PolyCalWidgetProvider extends AppWidgetProvider {
     public static final String RELOAD_EVENTS = "com.gyorog.polycal.RELOAD_EVENTS";
@@ -78,7 +80,33 @@ public class PolyCalWidgetProvider extends AppWidgetProvider {
 
             appWidgetManager.updateAppWidget(widgetId, remoteViews);
         }
+        scheduleRefresh(context);
         Log.d(TAG, "End of OnUpdate()");
+    }
+
+    // Periodically re-query events. Inexact, non-wakeup: fires on the next screen-on if the device is asleep.
+    public static void scheduleRefresh(Context context) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pendingIntent = refreshIntent(context);
+        alarmManager.cancel(pendingIntent);
+
+        long minutes = Long.parseLong(PreferenceManager.getDefaultSharedPreferences(context).getString("refresh_interval", "30"));
+        if (minutes > 0) {
+            long interval = minutes * 60 * 1000;
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval, interval, pendingIntent);
+        }
+        Log.d(TAG, "Auto refresh every " + minutes + " minutes");
+    }
+
+    @Override
+    public void onDisabled(Context context) {
+        ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).cancel(refreshIntent(context));
+        super.onDisabled(context);
+    }
+
+    private static PendingIntent refreshIntent(Context context) {
+        Intent intent = new Intent(context, PolyCalWidgetProvider.class).setAction(RELOAD_EVENTS);
+        return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     private boolean CheckScreenshotMode(Context context, int widget_id) {
@@ -89,17 +117,17 @@ public class PolyCalWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent){
-        if( intent.getAction() == RELOAD_EVENTS){
+        if( RELOAD_EVENTS.equals(intent.getAction()) ){
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             int[] allWidgetIDs = appWidgetManager.getAppWidgetIds( new ComponentName(context, this.getClass()) );
             appWidgetManager.notifyAppWidgetViewDataChanged(allWidgetIDs, R.id.listview);
         }
-        if( intent.getAction() == CHANGE_SOURCE){
+        if( CHANGE_SOURCE.equals(intent.getAction()) ){
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             int[] allWidgetIDs = appWidgetManager.getAppWidgetIds( new ComponentName(context, this.getClass()) );
             onUpdate(context, appWidgetManager, allWidgetIDs);
         }
-        if( intent.getAction() == LAUNCH_CALENDAR){
+        if( LAUNCH_CALENDAR.equals(intent.getAction()) ){
             //int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             long event_begin = intent.getLongExtra(EVENT_BEGIN, 0);
 

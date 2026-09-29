@@ -15,6 +15,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.color.DynamicColors;
+
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
@@ -26,11 +29,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        DynamicColors.applyToActivityIfAvailable(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         LinearLayout layout = findViewById(R.id.main_layout);
         context = getApplicationContext();
-        TextView tv = new TextView(context);
+        TextView tv = new TextView(this);
         tv.setEllipsize(null);
         tv.setHorizontallyScrolling(false);
 
@@ -43,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             tv.setTextSize((float)20.0);
             layout.addView(tv);
 
-            Button accept_button = new Button(context);
+            Button accept_button = new MaterialButton(this);
             accept_button.setText("OK");
             accept_button.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
@@ -62,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             tv.setTextSize((float)16.0);
             layout.addView(tv);
             for(int i=0; i<widget_ids.length; ++i){
-                Button button = new Button(context);
+                Button button = new MaterialButton(this);
                 button.setText(String.format("Configure widget %d", 1 + i));
                 button.setTag( widget_ids[i] );
                 button.setOnClickListener(new View.OnClickListener() {
